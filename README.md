@@ -1,3 +1,3 @@
 # Login_System
 This is a log in system made in Java, using pbkfd2 algorithm to hash the users passwords. Both the username and the password is saved in a database i created with the help of mySQL. In this app you can create a user. Log in with the existing username and password. The hash algorithm hashes the password and compares the two hashed password to see if it was correct. You can delete the user, search for other users and update the password. The password is checked that it fullfills all the criterias with the help of REGEX. ![Skärmbild (345)](https://user-images.githubusercontent.com/62659746/142208863-4cd6e6d3-fb56-445c-933c-89c9e6e9c6e9.png)
-![Skärmbild (346) - kopia](https://user-images.githubusercontent.com/62659746/142208882-f27f0632-bec8-49c4-9d63-68de486f1682.png)
+![Skärmbild (346) - kopia](https://user-images.githubusercontent.com/62659746/142208996-7e1df6d5-17c9-4500-9372-b04389d00065.png)
