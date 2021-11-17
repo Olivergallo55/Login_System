@@ -5,12 +5,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class DatabaseConnection {
 
 	private Connection dbConnection = null;
-	// private Statement statement = null;
 	private String loginName = "Oliver";
 	private String password = "root";
 	private String databaseName = "login_database";
@@ -21,19 +19,23 @@ public class DatabaseConnection {
 
 	public static void main(String[] args) {
 		new DatabaseConnection(new GUI());
-
 	}
 
+	/**
+	 * Public constructor
+	 **/
 	public DatabaseConnection(GUI gui) {
 		connectToDatabase();
 		au = new Autentication();
 	}
 
+	/**
+	 * Connects to the database
+	 */
 	private void connectToDatabase() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			dbConnection = DriverManager.getConnection(connectorUrl, loginName, password);
-			// Statement statement = dbConnection.createStatement();
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		}
@@ -56,7 +58,12 @@ public class DatabaseConnection {
 
 	}
 
-	// method check if the username already exists
+	/**
+	 * Method checks if a user exists and then returns either true or false
+	 * 
+	 * @param username is the user name given by the user
+	 * @return true if user name exist and false otherwise
+	 */
 	public boolean checkUser(String userName) {
 		try {
 			String user = "SELECT * FROM usertable WHERE username=?";
@@ -65,7 +72,6 @@ public class DatabaseConnection {
 			ResultSet set = prepareStatement.executeQuery();
 
 			while (set.next()) {
-				System.out.println("User Exist!");
 				return true;
 			}
 		} catch (Exception e) {
@@ -74,20 +80,24 @@ public class DatabaseConnection {
 		return false;
 	}
 
-	// validate password
-	// TODO put in finally block
+	/**
+	 * Method validates the password by getting the user name and the password, hash
+	 * it and compare it to the valid hashed password in the database. if the user
+	 * name or password is incorrect it will throw an error.
+	 * 
+	 * @param password is the password given by the user
+	 * @param username is the users user name
+	 * @return if the password is valid or not
+	 */
 	public boolean validatePassword(char[] password, String userName) {
-		PreparedStatement prepareStatement = null;
-
 		try {
 			String user = "SELECT password FROM usertable WHERE username=?";
-			prepareStatement = dbConnection.prepareStatement(user);
+			final PreparedStatement prepareStatement = dbConnection.prepareStatement(user);
 			prepareStatement.setString(1, userName);
 			ResultSet set = prepareStatement.executeQuery();
 
 			while (set.next()) {
 				String pw = set.getString("password");
-				System.out.println("db password: " + pw);
 				boolean match = au.validateHash(password, pw);
 				if (match)
 					return true;
@@ -98,4 +108,38 @@ public class DatabaseConnection {
 		return false;
 	}
 
+	/**
+	 * Deletes a user from the database
+	 * 
+	 * @param usernname is the users user name
+	 **/
+	public void deleteUser(String userName) {
+		try {
+			final PreparedStatement prepareStatement = dbConnection
+					.prepareStatement("DELETE FROM usertable WHERE username=?");
+			prepareStatement.setString(1, userName);
+			prepareStatement.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Method updates the users password
+	 * 
+	 * @param password is the new password
+	 * @param userName is the users user name who's password is going to be updated
+	 **/
+	public void updatePassword(String password, String userName) {
+		try {
+			final PreparedStatement prepareStatement = dbConnection
+					.prepareStatement("UPDATE usertable SET password=? WHERE username=?");
+			String hashedPassword = au.generateHash(password);
+			prepareStatement.setString(1, hashedPassword);
+			prepareStatement.setString(2, userName);
+			prepareStatement.executeUpdate();
+		} catch (SQLException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+			e.printStackTrace();
+		}
+	}
 }
