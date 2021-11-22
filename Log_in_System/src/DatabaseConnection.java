@@ -71,7 +71,7 @@ public class DatabaseConnection {
 			prepareStatement.setString(1, userName);
 			ResultSet set = prepareStatement.executeQuery();
 
-			while (set.next()) {
+			if (set.next()) {
 				return true;
 			}
 		} catch (Exception e) {
@@ -96,7 +96,7 @@ public class DatabaseConnection {
 			prepareStatement.setString(1, userName);
 			ResultSet set = prepareStatement.executeQuery();
 
-			while (set.next()) {
+			if (set.next()) {
 				String pw = set.getString("password");
 				boolean match = au.validateHash(password, pw);
 				if (match)
